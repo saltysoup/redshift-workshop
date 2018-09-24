@@ -97,9 +97,15 @@ Now that your connection is successful you can move on to the next section.
 We will use a public data set provided by [Instacart in May 2017](https://tech.instacart.com/3-million-instacart-orders-open-sourced-d40d29ead6f2) to look at Instcart's customers' shopping pattern. You can find the data dictionary for the data set [here](https://gist.github.com/jeremystan/c3b39d947d9b88b3ccff3147dbcf6c6b)
 
 ## Crawling the data set
+`IMPORTANT: If you are using AWS Glue in a region other than US-EAST-1, create a copy of S3 dataset into a local region. Without this, your Glue ETL Jobs will fail later in the Module`
 
 ### High-Level Instructions
-Create a new Glue crawler that will catalog `s3://royon-customer-public/instacart/` and create a new database called `instacart` and `raw_` as the prefix.
+Create a new Glue crawler that will catalog `s3://royon-customer-public/instacart/` and create a new database called `instacart` and `raw_` as the prefix. For Glue Crawler in a region outside US-EAST-1, create a copy of the S3 data into a local bucket first.
+
+Example: (check that MYBUCKET is in the same region as Glue Crawler)
+``` shell
+aws s3 sync s3://royon-customer-public/ s3://MYBUCKET/
+```
 
 <details>
 <summary><strong>Step-by-step instructions (expand for details)</strong></summary><p>
@@ -163,7 +169,8 @@ We'll now create a Glue ETL job that will process all 5 tables that the crawler 
 
 As you can see, AWS Glue created a script for you to get started. If you remember we still need to fix the Products table. Select everything in the script window and replace it with the code below.
 
-`Make sure you update OUTPUT_S3_PATH to point to your own S3 bucket, otherwise the job will fail.`
+`Make sure you update the values for GLUE_DB_CONNECTION and OUTPUT_S3_PATH to your own resources or the job will fail. GLUE_DB_CONNECTION is the Connection to Redshift you created in Step 1. `
+
 
 ``` python
 import sys
@@ -179,13 +186,14 @@ from awsglue.job import Job
 ##################
 GLUE_DB_NAME = "instacart"
 REDSHIFT_DB_NAME = "instacart"
+GLUE_DB_CONNECTION = "YOUR_CATALOG_REDSHIFT_CONNECTION"
 
 TBL_RAW_PRODUCTS = "raw_products"
 TBL_RAW_ORDERS = "raw_orders"
 TBL_RAW_ORDERS_PRIOR = "raw_orders_prior"
 TBL_RAW_DEPT = "raw_departments"
 
-OUTPUT_S3_PATH = "s3://your-bucket/prefix/"
+OUTPUT_S3_PATH = "s3://YOURS3BUCKET/"
 ##################
 
 ## @params: [JOB_NAME]
@@ -221,9 +229,9 @@ df_prods = DynamicFrame.fromDF(prods, glueContext, 'df_prods')
 df_depts = DynamicFrame.fromDF(departments, glueContext, 'df_depts')
 
 ## Write departments table to Redshift
-datasink1 = glueContext.write_dynamic_frame.from_jdbc_conf(frame = df_depts, catalog_connection = "SpectrumCluster", connection_options = {"dbtable": "departments", "database": REDSHIFT_DB_NAME}, redshift_tmp_dir = args["TempDir"], transformation_ctx = "datasink1")
+datasink1 = glueContext.write_dynamic_frame.from_jdbc_conf(frame = df_depts, catalog_connection = GLUE_DB_CONNECTION, connection_options = {"dbtable": "departments", "database": REDSHIFT_DB_NAME}, redshift_tmp_dir = args["TempDir"], transformation_ctx = "datasink1")
 ## Write products table to Redshift
-datasink2 = glueContext.write_dynamic_frame.from_jdbc_conf(frame = df_prods, catalog_connection = "SpectrumCluster", connection_options = {"dbtable": "products", "database": REDSHIFT_DB_NAME}, redshift_tmp_dir = args["TempDir"], transformation_ctx = "datasink2")
+datasink2 = glueContext.write_dynamic_frame.from_jdbc_conf(frame = df_prods, catalog_connection = GLUE_DB_CONNECTION, connection_options = {"dbtable": "products", "database": REDSHIFT_DB_NAME}, redshift_tmp_dir = args["TempDir"], transformation_ctx = "datasink2")
 
 ## Write orders data to S3 in Parquet format
 orders.coalesce(10) \
