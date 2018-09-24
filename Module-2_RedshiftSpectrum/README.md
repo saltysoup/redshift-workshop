@@ -149,6 +149,14 @@ Before we get started with creating a Glue ETL job, we need to make one small ch
 
 We'll now create a Glue ETL job that will process all 5 tables that the crawler created. We will create three fact tables in Redshift to hold the aisles, products and departments data. We will save the prior orders data in a Parquet optimized file format to Amazon S3.
 
+`Before proceeding with Glue, connect to your Redshift cluster using a SQL client tool and create a new database called instacart`
+
+EXAMPLE (within SQL workbench)
+
+``` sql
+CREATE DATABASE instacart
+```
+
 1. From the Glue ETL menu select **Jobs** and click **Add Job**
 
 1. Give your job a name such as **instacart_etl** and select our service role. Leave all of the other options unchanged but provide a **Temporary Directory** for the output.
