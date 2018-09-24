@@ -73,10 +73,6 @@ QuickSight does not have a managed policy so we'll need to create one and then a
 # Step 2: Connecting with Amazon QuickSight <a name="rs-gsg-quicksight-step2"></a>
 To explore the Instacart data we previously created we need to login to Amazon QuickSight and create a data set directly from Amazon Athena.
 
-Open the QuickSight console
-
-If it's your first time you'll be asked to enter an email address to create an account. If you've accessed QuickSight before you'll land in the main window
-
 ### High-Level Instructions
 Explore the dataset through visualization by adding the Athena tables `prior_orders` and `current_orders` in a new Amazon QuickSight analysis. To import the data, you may need to [allow access to your S3 bucket](https://docs.aws.amazon.com/quicksight/latest/user/troubleshoot-connect-S3.html).
 
