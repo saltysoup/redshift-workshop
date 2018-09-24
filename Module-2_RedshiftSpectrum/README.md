@@ -320,12 +320,15 @@ To run queries on Redshift you will need a SQL tool such as SQL Workbench/J. You
 1. Show the top 10 products most ordered by customers
 
     ``` sql
-    SELECT products.product_name, COUNT(DISTINCT orders.order_id) order_count
-    FROM taxis.instacart_schema.table_orders orders
+    SELECT products.product_name, COUNT(DISTINCT orders.order_id) AS order_count
+    FROM instacart.instacart_schema.table_orders AS orders
     JOIN products ON orders.product_id = products.product_id
-    GROUP BY products.product_name
-    ORDER BY order_count DESC
-    LIMIT 10
+    GROUP BY
+    products.product_name
+    ORDER BY
+    order_count DESC
+    LIMIT
+    10
     ```
 
     ![SQL result top 10 products](http://amazonathenahandson.s3-website-us-east-1.amazonaws.com/images/rs_groupbyproducts.png)

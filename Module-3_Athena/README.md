@@ -79,17 +79,58 @@ Create a new Athena database called `taxis` with a table schema referencing the 
 
 1. Since this is a partitioned table, denoted by the PARTITIONED BY clause, we need to update the partitions.
 Enter `MSCK REPAIR TABLE taxis` and click **Run Query**
-</p></details>
+
 
 1. Verify that all partitions were added by entering `SHOW PARTITIONS taxis` and click **Run Query**
 
+    ![show partitions](http://amazonathenahandson.s3-website-us-east-1.amazonaws.com/images/show_partitions.png)
 
+1. Explore the data by with some queries;
 
-### High-Level Instructions
+    + Select the top ten yellow taxis in 2016 ordered by pickup time in descending order
 
+    ``` sql
+    SELECT * 
+    FROM taxis.taxis
+    WHERE year=2016 AND type='yellow'
+    ORDER BY pickup_datetime desc
+    LIMIT 10;
+    ```
+    ![top 10 yellow taxi 2016](http://amazonathenahandson.s3-website-us-east-1.amazonaws.com/images/taxis_2016.png)
 
-<details>
-<summary><strong>Step-by-step instructions (expand for details)</strong></summary><p>
+    + Show how much money each taxi company made per year.
+
+    ``` sql
+    SELECT 
+    year,
+    type,
+    round(SUM(trip_distance),2) as "Total distance",
+    round(SUM(total_amount),2) as "Total amount"
+    FROM taxis.taxis
+    GROUP BY year, type
+    ORDER BY "Total amount" DESC
+    LIMIT 20
+    ```
+
+    + Lastly, lets see, for 2015 and 2016, how many passengers traveled during rush hours of 4pm and 7pm EST, grouped by day of week and ordered by the total number of passengers.
+
+    ``` sql
+    WITH dataset AS (
+    SELECT 
+        date(pickup_datetime) AS dd,
+        cast(date_format(pickup_datetime, '%H:%i') AS time) AS tt,
+        dow(date(pickup_datetime)) AS day,
+        *
+    FROM taxis
+    WHERE year BETWEEN 2015 AND 2016
+    )
+    SELECT day, sum(passenger_count) AS total_passengers
+    FROM dataset
+    WHERE tt BETWEEN time '16:00' AND time '16:00' + interval '3' hour
+    GROUP BY day
+    ORDER BY total_passengers desc
+    LIMIT 10
+    ```
 
 
 </p></details>
