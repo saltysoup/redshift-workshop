@@ -77,7 +77,7 @@ To explore the Instacart data we previously created we need to login to Amazon Q
 [Please see Instacart data dictionary for reference](https://gist.github.com/jeremystan/c3b39d947d9b88b3ccff3147dbcf6c6b)
 
 ### High-Level Instructions
-Explore the dataset through visualization by adding the Athena tables `prior_orders` and `current_orders` in a new Amazon QuickSight analysis. To import the data, you may need to [allow access to your S3 bucket](https://docs.aws.amazon.com/quicksight/latest/user/troubleshoot-connect-S3.html).
+Explore the dataset through visualization by adding the Athena tables `prior_orders` and `current_orders` in a new Amazon QuickSight analysis. To import the data, you may need to [allow access to your S3 bucket](https://docs.aws.amazon.com/quicksight/latest/user/troubleshoot-connect-S3.html). To speed up building analysis, use SPICE to import the data into QuickSight first.
 
 <details>
 <summary><strong>Step-by-step instructions (expand for details)</strong></summary><p>
@@ -106,7 +106,7 @@ Explore the dataset through visualization by adding the Athena tables `prior_ord
 
 ![table orders](http://amazonathenahandson.s3-website-us-east-1.amazonaws.com/images/quicksight_select_table.png)
 
-1. Select to **Directly query your data** and click Visualize
+1. Select **SPICE** and click Visualize
 
 At this point you are presented with a blank graph so feel free to play around and build interesting visualizations.
 
